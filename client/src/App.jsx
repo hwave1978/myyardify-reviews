@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import Header from "./Header";
 import ContractorCard from "./ContractorCard";
 import Login from "./Login";
+import Feed from "./Feed";
 import "./index.css";
 
 function App() {
   const [contractors, setContractors] = useState([]);
+  const [feed, setFeed] = useState([]);
   const [reviewForms, setReviewForms] = useState({});
   const [editingReviews, setEditingReviews] = useState({});
   const [activeIndexes, setActiveIndexes] = useState({});
@@ -49,8 +51,6 @@ function App() {
 
     data.forEach((contractor) => {
       forms[contractor.id] = {
-        firstName: "",
-        lastInitial: "",
         stars: "5",
         price: "$$",
         comment: ""
@@ -60,11 +60,58 @@ function App() {
     setReviewForms(forms);
   };
 
+  const fetchFeed = async () => {
+    if (!homeowner) {
+      setFeed([]);
+      return;
+    }
+
+    const response = await fetch("http://localhost:3001/feed");
+
+    if (!response.ok) {
+      setFeed([]);
+      return;
+    }
+
+    const data = await response.json();
+    setFeed(data);
+  };
+
   const checkHomeowner = async () => {
     const response = await fetch("http://localhost:3001/homeowner");
     const data = await response.json();
 
     setHomeowner(data);
+
+    if (data) {
+      setTimeout(() => {
+        fetchFeed();
+      }, 200);
+    }
+  };
+
+  const handleRegister = async (name, email, password) => {
+    const response = await fetch("http://localhost:3001/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ name, email, password })
+    });
+
+    if (!response.ok) {
+      alert("Registration failed");
+      return;
+    }
+
+    const data = await response.json();
+
+    setHomeowner(data);
+    fetchContractors();
+
+    setTimeout(() => {
+      fetchFeed();
+    }, 200);
   };
 
   const handleLogin = async (email, password) => {
@@ -82,7 +129,13 @@ function App() {
     }
 
     const data = await response.json();
+
     setHomeowner(data);
+    fetchContractors();
+
+    setTimeout(() => {
+      fetchFeed();
+    }, 200);
   };
 
   const handleLogout = async () => {
@@ -91,6 +144,9 @@ function App() {
     });
 
     setHomeowner(null);
+    setFeed([]);
+
+    fetchContractors();
   };
 
   const handleLike = async (contractorId) => {
@@ -99,6 +155,30 @@ function App() {
     });
 
     fetchContractors();
+  };
+
+  const handleFollow = async (contractorId) => {
+    await fetch(`http://localhost:3001/contractors/${contractorId}/follow`, {
+      method: "POST"
+    });
+
+    fetchContractors();
+
+    setTimeout(() => {
+      fetchFeed();
+    }, 200);
+  };
+
+  const handleUnfollow = async (contractorId) => {
+    await fetch(`http://localhost:3001/contractors/${contractorId}/unfollow`, {
+      method: "POST"
+    });
+
+    fetchContractors();
+
+    setTimeout(() => {
+      fetchFeed();
+    }, 200);
   };
 
   const handleFormChange = (contractorId, e) => {
@@ -115,7 +195,7 @@ function App() {
 
   const handleSubmitReview = async (contractorId) => {
     if (!homeowner) {
-      alert("Please log in as a homeowner to leave a review.");
+      alert("Please log in first.");
       return;
     }
 
@@ -158,8 +238,6 @@ function App() {
     setReviewForms((prev) => ({
       ...prev,
       [contractorId]: {
-        firstName: "",
-        lastInitial: "",
         stars: "5",
         price: "$$",
         comment: ""
@@ -167,6 +245,10 @@ function App() {
     }));
 
     fetchContractors();
+
+    setTimeout(() => {
+      fetchFeed();
+    }, 200);
   };
 
   const handleEditReview = (contractorId, review) => {
@@ -178,8 +260,6 @@ function App() {
     setReviewForms((prev) => ({
       ...prev,
       [contractorId]: {
-        firstName: "",
-        lastInitial: "",
         stars: String(review.stars),
         price: review.price,
         comment: review.comment
@@ -194,8 +274,11 @@ function App() {
       <Login
         homeowner={homeowner}
         onLogin={handleLogin}
+        onRegister={handleRegister}
         onLogout={handleLogout}
       />
+
+      {homeowner && <Feed feed={feed} />}
 
       <div className="contractor-grid">
         {contractors.map((contractor) => {
@@ -215,6 +298,8 @@ function App() {
               editingReviewId={editingReviews[contractor.id]}
               homeowner={homeowner}
               onLike={handleLike}
+              onFollow={handleFollow}
+              onUnfollow={handleUnfollow}
               onFormChange={handleFormChange}
               onSubmitReview={handleSubmitReview}
               onEditReview={handleEditReview}

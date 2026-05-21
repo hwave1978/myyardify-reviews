@@ -22,14 +22,23 @@ body {
   padding: 20px;
 }
 
-.contractor-card {
+.contractor-card,
+.login-box,
+.feed-section {
   background-color: white;
   border-radius: 10px;
   padding: 20px;
+  margin: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.contractor-card h2 {
+.contractor-card {
+  margin: 0;
+}
+
+.contractor-card h2,
+.login-box h2,
+.feed-section h2 {
   margin-top: 0;
   color: #2f5f1e;
 }
@@ -40,7 +49,8 @@ body {
 }
 
 .like-button,
-.share-button {
+.share-button,
+.follow-button {
   background-color: #5fa834;
   color: white;
   border: none;
@@ -52,7 +62,8 @@ body {
 }
 
 .like-button:hover,
-.share-button:hover {
+.share-button:hover,
+.follow-button:hover {
   opacity: 0.9;
 }
 
@@ -87,7 +98,8 @@ body {
 
 .review-form input,
 .review-form select,
-.review-form textarea {
+.review-form textarea,
+.login-box input {
   width: 100%;
   margin-bottom: 12px;
   padding: 10px;
@@ -101,7 +113,8 @@ body {
   resize: vertical;
 }
 
-.review-form button {
+.review-form button,
+.login-box button {
   background-color: #5fa834;
   color: white;
   border: none;
@@ -111,7 +124,8 @@ body {
   margin-right: 10px;
 }
 
-.review-form button:hover {
+.review-form button:hover,
+.login-box button:hover {
   opacity: 0.9;
 }
 
@@ -119,45 +133,27 @@ body {
   background-color: #4d7c2f;
 }
 
-.login-box {
-  background-color: white;
-  margin: 20px;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.login-notice,
+.empty-feed {
+  margin-top: 18px;
+  color: #666;
+  font-style: italic;
 }
 
-.login-box h2 {
+.feed-card {
+  background-color: #eef6e8;
+  border-radius: 8px;
+  padding: 14px;
+  margin-top: 12px;
+}
+
+.feed-card h3 {
   margin-top: 0;
   color: #2f5f1e;
 }
 
-.login-box input {
-  width: 100%;
-  margin-bottom: 12px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-sizing: border-box;
-}
-
-.login-box button {
-  background-color: #5fa834;
-  color: white;
-  border: none;
-  padding: 10px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.login-box button:hover {
-  opacity: 0.9;
-}
-
-.login-notice {
-  margin-top: 18px;
-  color: #666;
-  font-style: italic;
+.feed-card p {
+  margin: 6px 0;
 }
 
 @keyframes fadeComment {

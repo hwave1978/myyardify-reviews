@@ -1,33 +1,32 @@
-import ContractorCard from "./ContractorCard";
-
-function Feed({
-  contractors,
-  likeContractor,
-  followContractor,
-  newComment,
-  setNewComment,
-}) {
+function Feed({ feed }) {
   return (
-    <main>
-      <h2>Community Feed</h2>
+    <div className="feed-section">
+      <h2>Following Feed</h2>
 
-      <p>
-        Homeowners can follow contractors,
-        like reviews, and leave comments.
-      </p>
+      {feed.length === 0 && (
+        <p className="empty-feed">
+          Follow contractors to see recent homeowner reviews.
+        </p>
+      )}
 
-      {contractors.map((contractor, index) => (
-        <ContractorCard
-          key={contractor.name}
-          contractor={contractor}
-          index={index}
-          likeContractor={likeContractor}
-          followContractor={followContractor}
-          newComment={newComment}
-          setNewComment={setNewComment}
-        />
+      {feed.map((item) => (
+        <div className="feed-card" key={item.reviewId}>
+          <h3>{item.contractorName}</h3>
+
+          <p>{item.services}</p>
+
+          <p>{item.area}</p>
+
+          <p>{"★".repeat(item.stars)}</p>
+
+          <p>{item.price}</p>
+
+          <p>
+            {item.homeownerName} - {item.comment}
+          </p>
+        </div>
       ))}
-    </main>
+    </div>
   );
 }
 

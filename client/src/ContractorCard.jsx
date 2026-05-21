@@ -5,6 +5,8 @@ function ContractorCard({
   editingReviewId,
   homeowner,
   onLike,
+  onFollow,
+  onUnfollow,
   onFormChange,
   onSubmitReview,
   onEditReview
@@ -38,6 +40,21 @@ function ContractorCard({
         Like {contractor.likes}
       </button>
 
+      {homeowner && !contractor.isFollowing && (
+        <button className="follow-button" onClick={() => onFollow(contractor.id)}>
+          Follow
+        </button>
+      )}
+
+      {homeowner && contractor.isFollowing && (
+        <button
+          className="follow-button"
+          onClick={() => onUnfollow(contractor.id)}
+        >
+          Unfollow
+        </button>
+      )}
+
       <button className="share-button" onClick={handleShare}>
         Share
       </button>
@@ -65,7 +82,7 @@ function ContractorCard({
 
       {!homeowner && (
         <p className="login-notice">
-          Log in as a homeowner to leave a review.
+          Log in as a homeowner to leave a review or follow contractors.
         </p>
       )}
 
