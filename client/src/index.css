@@ -1,0 +1,179 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f3f4f6;
+}
+
+.header {
+  background-color: #5fa834;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+.header h1 {
+  margin: 0;
+}
+
+.contractor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.contractor-card {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.contractor-card h2 {
+  margin-top: 0;
+  color: #2f5f1e;
+}
+
+.contractor-info {
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.like-button,
+.share-button {
+  background-color: #5fa834;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+  margin-right: 10px;
+}
+
+.like-button:hover,
+.share-button:hover {
+  opacity: 0.9;
+}
+
+.rating-display {
+  margin-top: 18px;
+}
+
+.fade-comment {
+  margin-top: 14px;
+  padding: 14px;
+  background-color: #eef6e8;
+  border-radius: 8px;
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+  animation: fadeComment 4s ease-in-out;
+}
+
+.fade-comment p {
+  margin: 0;
+  color: #333;
+}
+
+.review-form {
+  margin-top: 20px;
+}
+
+.review-form h3 {
+  margin-bottom: 12px;
+  color: #2f5f1e;
+}
+
+.review-form input,
+.review-form select,
+.review-form textarea {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.review-form textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.review-form button {
+  background-color: #5fa834;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.review-form button:hover {
+  opacity: 0.9;
+}
+
+.edit-button {
+  background-color: #4d7c2f;
+}
+
+.login-box {
+  background-color: white;
+  margin: 20px;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.login-box h2 {
+  margin-top: 0;
+  color: #2f5f1e;
+}
+
+.login-box input {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.login-box button {
+  background-color: #5fa834;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.login-box button:hover {
+  opacity: 0.9;
+}
+
+.login-notice {
+  margin-top: 18px;
+  color: #666;
+  font-style: italic;
+}
+
+@keyframes fadeComment {
+  0% {
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 1;
+  }
+
+  85% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
