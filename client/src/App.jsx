@@ -10,36 +10,12 @@ function App() {
   const [feed, setFeed] = useState([]);
   const [reviewForms, setReviewForms] = useState({});
   const [editingReviews, setEditingReviews] = useState({});
-  const [activeIndexes, setActiveIndexes] = useState({});
   const [homeowner, setHomeowner] = useState(null);
 
   useEffect(() => {
     fetchContractors();
     checkHomeowner();
   }, []);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveIndexes((prev) => {
-        const updated = {};
-
-        contractors.forEach((contractor) => {
-          const reviewCount = contractor.reviews.length;
-
-          if (reviewCount === 0) {
-            updated[contractor.id] = 0;
-          } else {
-            updated[contractor.id] =
-              ((prev[contractor.id] || 0) + 1) % reviewCount;
-          }
-        });
-
-        return updated;
-      });
-    }, 4000);
-
-    return () => clearInterval(interval);
-  }, [contractors]);
 
   const fetchContractors = async () => {
     const response = await fetch("http://localhost:3001/contractors");
@@ -150,19 +126,19 @@ function App() {
   };
 
   const handleLike = async (contractorId) => {
-  const response = await fetch(
-    `http://localhost:3001/contractors/${contractorId}/like`,
-    {
-      method: "POST"
+    const response = await fetch(
+      `http://localhost:3001/contractors/${contractorId}/like`,
+      {
+        method: "POST"
+      }
+    );
+
+    if (!response.ok) {
+      return;
     }
-  );
 
-  if (!response.ok) {
-    return;
-  }
-
-  fetchContractors();
-};
+    fetchContractors();
+  };
 
   const handleFollow = async (contractorId) => {
     await fetch(`http://localhost:3001/contractors/${contractorId}/follow`, {
@@ -289,12 +265,8 @@ function App() {
 
       <div className="contractor-grid">
         {contractors.map((contractor) => {
-          const activeIndex = activeIndexes[contractor.id] || 0;
-
           const activeReview =
-            contractor.reviews.length > 0
-              ? contractor.reviews[activeIndex]
-              : null;
+            contractor.reviews.length > 0 ? contractor.reviews[0] : null;
 
           return (
             <ContractorCard
