@@ -73,6 +73,8 @@ app.post("/logout", (req, res) => {
 });
 
 app.get("/contractors", (req, res) => {
+  const homeownerId = currentHomeowner ? currentHomeowner.id : 0;
+
   const sql = `
     SELECT
       contractors.id,
@@ -80,26 +82,37 @@ app.get("/contractors", (req, res) => {
       contractors.services,
       contractors.area,
       contractors.likes,
+
       reviews.id AS reviewId,
       reviews.homeowner_id,
       reviews.stars,
       reviews.price,
       reviews.comment,
+
       homeowners.name AS homeownerName,
-      followed_contractors.id AS followId
+
+      followed_contractors.id AS followId,
+
+      likes.id AS likeId
+
     FROM contractors
+
     LEFT JOIN reviews
       ON contractors.id = reviews.contractor_id
+
     LEFT JOIN homeowners
       ON reviews.homeowner_id = homeowners.id
+
     LEFT JOIN followed_contractors
       ON contractors.id = followed_contractors.contractor_id
       AND followed_contractors.homeowner_id = ?
+
+    LEFT JOIN likes
+      ON contractors.id = likes.contractor_id
+      AND likes.homeowner_id = ?
   `;
 
-  const homeownerId = currentHomeowner ? currentHomeowner.id : 0;
-
-  db.query(sql, [homeownerId], (err, results) => {
+  db.query(sql, [homeownerId, homeownerId], (err, results) => {
     if (err) {
       return res.status(500).json(err);
     }
@@ -115,19 +128,26 @@ app.get("/contractors", (req, res) => {
           area: row.area,
           likes: row.likes,
           isFollowing: row.followId ? true : false,
+          isLiked: row.likeId ? true : false,
           reviews: []
         };
       }
 
       if (row.reviewId) {
-        contractorsMap[row.id].reviews.push({
-          id: row.reviewId,
-          homeownerId: row.homeowner_id,
-          name: row.homeownerName,
-          stars: row.stars,
-          price: row.price,
-          comment: row.comment
-        });
+        const reviewAlreadyAdded = contractorsMap[row.id].reviews.some(
+          (review) => review.id === row.reviewId
+        );
+
+        if (!reviewAlreadyAdded) {
+          contractorsMap[row.id].reviews.push({
+            id: row.reviewId,
+            homeownerId: row.homeowner_id,
+            name: row.homeownerName,
+            stars: row.stars,
+            price: row.price,
+            comment: row.comment
+          });
+        }
       }
     });
 
@@ -136,20 +156,40 @@ app.get("/contractors", (req, res) => {
 });
 
 app.post("/contractors/:id/like", (req, res) => {
-  const contractorId = req.params.id;
+  if (!currentHomeowner) {
+    return res.status(401).json({ error: "Please log in first" });
+  }
 
-  const sql = `
-    UPDATE contractors
-    SET likes = likes + 1
-    WHERE id = ?
+  const contractorId = req.params.id;
+  const homeownerId = currentHomeowner.id;
+
+  const insertLikeSql = `
+    INSERT INTO likes (homeowner_id, contractor_id)
+    VALUES (?, ?)
   `;
 
-  db.query(sql, [contractorId], (err) => {
+  db.query(insertLikeSql, [homeownerId, contractorId], (err) => {
     if (err) {
+      if (err.code === "ER_DUP_ENTRY") {
+        return res.status(400).json({ error: "You already liked this contractor" });
+      }
+
       return res.status(500).json(err);
     }
 
-    res.json({ message: "Like added" });
+    const updateContractorSql = `
+      UPDATE contractors
+      SET likes = likes + 1
+      WHERE id = ?
+    `;
+
+    db.query(updateContractorSql, [contractorId], (updateErr) => {
+      if (updateErr) {
+        return res.status(500).json(updateErr);
+      }
+
+      res.json({ message: "Like added" });
+    });
   });
 });
 

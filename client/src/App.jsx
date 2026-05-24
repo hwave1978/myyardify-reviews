@@ -150,12 +150,19 @@ function App() {
   };
 
   const handleLike = async (contractorId) => {
-    await fetch(`http://localhost:3001/contractors/${contractorId}/like`, {
+  const response = await fetch(
+    `http://localhost:3001/contractors/${contractorId}/like`,
+    {
       method: "POST"
-    });
+    }
+  );
 
-    fetchContractors();
-  };
+  if (!response.ok) {
+    return;
+  }
+
+  fetchContractors();
+};
 
   const handleFollow = async (contractorId) => {
     await fetch(`http://localhost:3001/contractors/${contractorId}/follow`, {

@@ -9,7 +9,7 @@ function ContractorCard({
   onUnfollow,
   onFormChange,
   onSubmitReview,
-  onEditReview
+  onEditReview,
 }) {
   const handleShare = async () => {
     let text = `Check out ${contractor.name} on MyYardify Reviews. Services: ${contractor.services}. Area: ${contractor.area}.`;
@@ -21,7 +21,7 @@ function ContractorCard({
     if (navigator.share) {
       await navigator.share({
         title: "MyYardify Reviews",
-        text: text
+        text: text,
       });
     } else {
       await navigator.clipboard.writeText(text);
@@ -36,12 +36,21 @@ function ContractorCard({
       <p className="contractor-info">{contractor.services}</p>
       <p className="contractor-info">{contractor.area}</p>
 
-      <button className="like-button" onClick={() => onLike(contractor.id)}>
-        Like {contractor.likes}
+      <button
+        className="like-button"
+        onClick={() => onLike(contractor.id)}
+        disabled={contractor.isLiked}
+      >
+        {contractor.isLiked
+          ? `Liked ${contractor.likes}`
+          : `Like ${contractor.likes}`}
       </button>
 
       {homeowner && !contractor.isFollowing && (
-        <button className="follow-button" onClick={() => onFollow(contractor.id)}>
+        <button
+          className="follow-button"
+          onClick={() => onFollow(contractor.id)}
+        >
           Follow
         </button>
       )}
