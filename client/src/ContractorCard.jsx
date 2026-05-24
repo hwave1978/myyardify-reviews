@@ -11,29 +11,36 @@ function ContractorCard({
   onSubmitReview,
   onEditReview,
 }) {
-  const handleShare = async () => {
+  const handleShare = () => {
     let text = `Check out ${contractor.name} on MyYardify Reviews. Services: ${contractor.services}. Area: ${contractor.area}.`;
 
     if (activeReview) {
       text += ` Homeowner review from ${activeReview.name}: "${activeReview.comment}" Rating: ${activeReview.stars} stars. Price: ${activeReview.price}.`;
     }
 
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: contractor.name,
-          text,
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    } else {
-      try {
-        await navigator.clipboard.writeText(text);
-        alert("Contractor info copied.");
-      } catch {
-        alert("Sharing not supported.");
-      }
+    const encodedText = encodeURIComponent(text);
+
+    const choice = window.prompt(
+      "Type F for Facebook, X for Twitter/X, E for Email, or press Cancel.",
+      "",
+    );
+
+    if (!choice) return;
+
+    const lowerChoice = choice.toLowerCase();
+
+    if (lowerChoice === "f") {
+      window.open(
+        `https://www.facebook.com/sharer/sharer.php?quote=${encodedText}`,
+        "_blank",
+      );
+    } else if (lowerChoice === "x") {
+      window.open(
+        `https://twitter.com/intent/tweet?text=${encodedText}`,
+        "_blank",
+      );
+    } else if (lowerChoice === "e") {
+      window.location.href = `mailto:?subject=MyYardify Review&body=${encodedText}`;
     }
   };
 
