@@ -9,16 +9,28 @@ function ContractorCard({
   onUnfollow,
   onFormChange,
   onSubmitReview,
-  onEditReview,
+  onEditReview
 }) {
-  const handleShare = () => {
+  const handleShare = async () => {
     let text = `Check out ${contractor.name} on MyYardify Reviews. Services: ${contractor.services}. Area: ${contractor.area}.`;
 
     if (activeReview) {
       text += ` Homeowner review from ${activeReview.name}: "${activeReview.comment}" Rating: ${activeReview.stars} stars. Price: ${activeReview.price}.`;
     }
 
-    window.prompt("Copy this contractor info:", text);
+    try {
+      await navigator.clipboard.writeText(text);
+      alert("Contractor info copied.");
+    } catch {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+
+      alert("Contractor info copied.");
+    }
   };
 
   return (
