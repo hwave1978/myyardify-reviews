@@ -1,21 +1,33 @@
+import { useEffect, useState } from "react";
+
 function Feed({ feed }) {
-  const recentFeed = feed.slice(0, 3);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    if (feed.length === 0) return;
+
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % feed.length);
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [feed]);
+
+  const activeFeed = feed[activeIndex];
 
   return (
     <div className="feed-section">
       <h2>Following Feed</h2>
 
-      {recentFeed.length === 0 ? (
+      {!activeFeed ? (
         <p>Follow contractors to see recent homeowner reviews.</p>
       ) : (
-        recentFeed.map((item) => (
-          <div className="feed-item" key={item.reviewId}>
-            <strong>{item.contractorName}</strong>
-            <p>
-              {item.homeownerName} - {item.comment}
-            </p>
-          </div>
-        ))
+        <div className="feed-fade-message" key={activeFeed.reviewId}>
+          <strong>{activeFeed.contractorName}</strong>
+          <p>
+            {activeFeed.homeownerName} - {activeFeed.comment}
+          </p>
+        </div>
       )}
     </div>
   );

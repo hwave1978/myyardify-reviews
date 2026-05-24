@@ -11,22 +11,14 @@ function ContractorCard({
   onSubmitReview,
   onEditReview,
 }) {
-  const handleShare = async () => {
+  const handleShare = () => {
     let text = `Check out ${contractor.name} on MyYardify Reviews. Services: ${contractor.services}. Area: ${contractor.area}.`;
 
     if (activeReview) {
       text += ` Homeowner review from ${activeReview.name}: "${activeReview.comment}" Rating: ${activeReview.stars} stars. Price: ${activeReview.price}.`;
     }
 
-    if (navigator.share) {
-      await navigator.share({
-        title: "MyYardify Reviews",
-        text: text,
-      });
-    } else {
-      await navigator.clipboard.writeText(text);
-      alert("Review information copied.");
-    }
+    window.prompt("Copy this contractor info:", text);
   };
 
   return (
@@ -77,16 +69,6 @@ function ContractorCard({
         <p>
           Price: {activeReview ? activeReview.price : "No price rating yet"}
         </p>
-      </div>
-
-      <div className="fade-comment">
-        {activeReview ? (
-          <p>
-            {activeReview.name} - {activeReview.comment}
-          </p>
-        ) : (
-          <p>No homeowner reviews yet.</p>
-        )}
       </div>
 
       {!homeowner && (

@@ -173,3 +173,28 @@ body {
     opacity: 0;
   }
 }
+
+.feed-fade-message {
+  background-color: #eef6e9;
+  padding: 20px;
+  border-radius: 10px;
+  animation: fadeFeed 4s ease-in-out;
+}
+
+@keyframes fadeFeed {
+  0% {
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  80% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.35;
+  }
+}
