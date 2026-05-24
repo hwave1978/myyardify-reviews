@@ -9,7 +9,7 @@ function ContractorCard({
   onUnfollow,
   onFormChange,
   onSubmitReview,
-  onEditReview
+  onEditReview,
 }) {
   const handleShare = async () => {
     let text = `Check out ${contractor.name} on MyYardify Reviews. Services: ${contractor.services}. Area: ${contractor.area}.`;
@@ -18,18 +18,22 @@ function ContractorCard({
       text += ` Homeowner review from ${activeReview.name}: "${activeReview.comment}" Rating: ${activeReview.stars} stars. Price: ${activeReview.price}.`;
     }
 
-    try {
-      await navigator.clipboard.writeText(text);
-      alert("Contractor info copied.");
-    } catch {
-      const textArea = document.createElement("textarea");
-      textArea.value = text;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand("copy");
-      document.body.removeChild(textArea);
-
-      alert("Contractor info copied.");
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: contractor.name,
+          text,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(text);
+        alert("Contractor info copied.");
+      } catch {
+        alert("Sharing not supported.");
+      }
     }
   };
 
