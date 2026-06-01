@@ -1,0 +1,41 @@
+# Name that appears in the GitHub Actions page
+name: React Build Check
+
+# Runs this workflow whenever code is pushed to GitHub
+on:
+  push:
+
+jobs:
+  build:
+
+    # GitHub creates a temporary Linux computer
+    runs-on: ubuntu-latest
+
+    # Run commands inside the client folder
+    defaults:
+      run:
+        working-directory: client
+
+    steps:
+
+      # Download my repository onto the temporary computer
+      - uses: actions/checkout@v4
+
+      # Install Node.js so React can run
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Install project dependencies from package.json
+      - name: Install Dependencies
+        run: npm install
+
+      # Try to build the React application
+      # If there are errors, the workflow fails
+      - name: Build React App
+        run: npm run build
+
+
+
+
+        #This workflow runs every time I push code. GitHub creates a temporary Linux environment, downloads my project, installs Node.js, installs the project dependencies, and attempts to build the React application. If the build fails, GitHub alerts me that there is a problem with the code.
