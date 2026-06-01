@@ -1,0 +1,28 @@
+# Name shown in the GitHub Actions page
+name: JavaScript Syntax Check
+
+# Run this workflow every time code is pushed to GitHub
+on:
+  push:
+
+jobs:
+  syntax-check:
+
+    # GitHub creates a temporary Linux computer
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # Download my MyYardify project files
+      - uses: actions/checkout@v4
+
+      # Install Node.js so GitHub can understand JavaScript
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Check server.js for JavaScript syntax errors
+      # If a bracket, quote, or parenthesis is missing,
+      # the workflow fails with a red X
+      - name: Check server.js Syntax
+        run: node --check server/server.js
