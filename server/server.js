@@ -346,4 +346,4 @@ app.put("/contractors/:id/review/:reviewId", (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`MyYardify Reviews backend running on http://localhost:${PORT}`);
-});
+};
