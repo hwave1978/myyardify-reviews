@@ -74,53 +74,67 @@ app.post("/logout", (req, res) => {
 
 app.get("/contractors", (req, res) => {
   const homeownerId = currentHomeowner ? currentHomeowner.id : 0;
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 50;
+  const offset = (page - 1) * limit;
 
-  const sql = `
+  const contractorSql = `
     SELECT
       contractors.id,
       contractors.name,
       contractors.services,
       contractors.area,
       contractors.likes,
-
-      reviews.id AS reviewId,
-      reviews.homeowner_id,
-      reviews.stars,
-      reviews.price,
-      reviews.comment,
-
-      homeowners.name AS homeownerName,
-
       followed_contractors.id AS followId,
-
       likes.id AS likeId
-
     FROM contractors
-
-    LEFT JOIN reviews
-      ON contractors.id = reviews.contractor_id
-
-    LEFT JOIN homeowners
-      ON reviews.homeowner_id = homeowners.id
-
     LEFT JOIN followed_contractors
       ON contractors.id = followed_contractors.contractor_id
       AND followed_contractors.homeowner_id = ?
-
     LEFT JOIN likes
       ON contractors.id = likes.contractor_id
       AND likes.homeowner_id = ?
+    ORDER BY contractors.id
+    LIMIT ? OFFSET ?
   `;
 
-  db.query(sql, [homeownerId, homeownerId], (err, results) => {
+  db.query(contractorSql, [homeownerId, homeownerId, limit, offset], (err, contractorRows) => {
     if (err) {
       return res.status(500).json(err);
     }
 
-    const contractorsMap = {};
+    if (contractorRows.length === 0) {
+      return res.json([]);
+    }
 
-    results.forEach((row) => {
-      if (!contractorsMap[row.id]) {
+    const contractorIds = contractorRows.map((contractor) => contractor.id);
+    const placeholders = contractorIds.map(() => "?").join(",");
+
+    const reviewSql = `
+      SELECT
+        reviews.id AS reviewId,
+        reviews.contractor_id,
+        reviews.homeowner_id,
+        reviews.stars,
+        reviews.price,
+        reviews.comment,
+        homeowners.name AS homeownerName
+      FROM reviews
+      LEFT JOIN homeowners
+        ON reviews.homeowner_id = homeowners.id
+      WHERE reviews.contractor_id IN (${placeholders})
+      ORDER BY reviews.id DESC
+      LIMIT 50
+    `;
+
+    db.query(reviewSql, contractorIds, (reviewErr, reviewRows) => {
+      if (reviewErr) {
+        return res.status(500).json(reviewErr);
+      }
+
+      const contractorsMap = {};
+
+      contractorRows.forEach((row) => {
         contractorsMap[row.id] = {
           id: row.id,
           name: row.name,
@@ -131,15 +145,11 @@ app.get("/contractors", (req, res) => {
           isLiked: row.likeId ? true : false,
           reviews: []
         };
-      }
+      });
 
-      if (row.reviewId) {
-        const reviewAlreadyAdded = contractorsMap[row.id].reviews.some(
-          (review) => review.id === row.reviewId
-        );
-
-        if (!reviewAlreadyAdded) {
-          contractorsMap[row.id].reviews.push({
+      reviewRows.forEach((row) => {
+        if (contractorsMap[row.contractor_id]) {
+          contractorsMap[row.contractor_id].reviews.push({
             id: row.reviewId,
             homeownerId: row.homeowner_id,
             name: row.homeownerName,
@@ -148,10 +158,10 @@ app.get("/contractors", (req, res) => {
             comment: row.comment
           });
         }
-      }
-    });
+      });
 
-    res.json(Object.values(contractorsMap));
+      res.json(Object.values(contractorsMap));
+    });
   });
 });
 
@@ -246,10 +256,6 @@ app.post("/contractors/:id/unfollow", (req, res) => {
 });
 
 app.get("/feed", (req, res) => {
-  if (!currentHomeowner) {
-    return res.status(401).json({ error: "Please log in first" });
-  }
-
   const sql = `
     SELECT
       contractors.name AS contractorName,
@@ -260,24 +266,26 @@ app.get("/feed", (req, res) => {
       reviews.price,
       reviews.comment,
       homeowners.name AS homeownerName
-    FROM followed_contractors
+    FROM reviews
     JOIN contractors
-      ON followed_contractors.contractor_id = contractors.id
-    JOIN reviews
-      ON contractors.id = reviews.contractor_id
+      ON reviews.contractor_id = contractors.id
     JOIN homeowners
       ON reviews.homeowner_id = homeowners.id
-    WHERE followed_contractors.homeowner_id = ?
     ORDER BY reviews.id DESC
+    LIMIT 100
   `;
 
-  db.query(sql, [currentHomeowner.id], (err, results) => {
-    if (err) {
-      return res.status(500).json(err);
-    }
+  console.time("feed query");
 
-    res.json(results);
-  });
+db.query(sql, (err, results) => {
+  console.timeEnd("feed query");
+
+  if (err) {
+    return res.status(500).json(err);
+  }
+
+  res.json(results);
+});
 });
 
 app.post("/contractors/:id/review", (req, res) => {

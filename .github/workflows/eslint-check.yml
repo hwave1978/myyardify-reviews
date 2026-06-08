@@ -1,0 +1,35 @@
+# Name shown in GitHub Actions
+name: ESLint Code Quality Check
+
+# Run every time code is pushed
+on:
+  push:
+
+jobs:
+  lint:
+
+    # GitHub creates a temporary Linux computer
+    runs-on: ubuntu-latest
+
+    # Run commands inside the React client folder
+    defaults:
+      run:
+        working-directory: client
+
+    steps:
+
+      # Download my repository
+      - uses: actions/checkout@v4
+
+      # Install Node.js
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Install dependencies from package.json
+      - name: Install Dependencies
+        run: npm install
+
+      # Run ESLint against the React project
+      - name: Run ESLint
+        run: npm run lint

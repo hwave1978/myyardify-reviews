@@ -12,10 +12,7 @@ function App() {
   const [editingReviews, setEditingReviews] = useState({});
   const [homeowner, setHomeowner] = useState(null);
 
-  useEffect(() => {
-    fetchContractors();
-    checkHomeowner();
-  }, []);
+  
 
   const fetchContractors = async () => {
     const response = await fetch("http://localhost:3001/contractors");
@@ -37,21 +34,16 @@ function App() {
   };
 
   const fetchFeed = async () => {
-    if (!homeowner) {
-      setFeed([]);
-      return;
-    }
+  const response = await fetch("http://localhost:3001/feed");
 
-    const response = await fetch("http://localhost:3001/feed");
+  if (!response.ok) {
+    setFeed([]);
+    return;
+  }
 
-    if (!response.ok) {
-      setFeed([]);
-      return;
-    }
-
-    const data = await response.json();
-    setFeed(data);
-  };
+  const data = await response.json();
+  setFeed(data);
+};
 
   const checkHomeowner = async () => {
     const response = await fetch("http://localhost:3001/homeowner");
@@ -65,6 +57,12 @@ function App() {
       }, 200);
     }
   };
+
+  useEffect(() => {
+  fetchContractors();
+  checkHomeowner();
+  fetchFeed();
+  }, []);
 
   const handleRegister = async (name, email, password) => {
     const response = await fetch("http://localhost:3001/register", {
@@ -261,7 +259,7 @@ function App() {
         onLogout={handleLogout}
       />
 
-      {homeowner && <Feed feed={feed} />}
+      <Feed feed={feed} />
 
       <div className="contractor-grid">
         {contractors.map((contractor) => {
